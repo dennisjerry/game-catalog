@@ -295,6 +295,11 @@ footer{
 (function(){
   'use strict';
   var DATA = JSON.parse(document.getElementById('game-data').textContent);
+  DATA.forEach(function(g){
+    if((g.t||[]).indexOf('PC (Steam)') === -1){
+      g.t = ['非 Steam'].concat(g.t||[]);
+    }
+  });
   var state = { q:'', tag:null, status:null, sharer:null, players:null, sort:'date-desc' };
 
   document.getElementById('stat-total').textContent = DATA.length;
