@@ -319,6 +319,18 @@ footer{
 .wheel-result .wr-name a:hover{color:var(--accent);}
 .wheel-result .wr-tags{font-size:11px; color:var(--tag-fg);}
 
+.wheel-seg-label{
+  position:absolute; top:50%; left:50%; width:110px; margin-left:-55px;
+  text-align:center; font-weight:700; font-size:13px; color:#fff;
+  text-shadow:0 1px 3px rgba(0,0,0,.6); pointer-events:none;
+  transform-origin:center;
+}
+.wheel2-result{
+  margin-top:18px; padding-top:16px; border-top:1px dashed var(--line); text-align:center;
+}
+.wheel2-result .wr-label{font-size:12px; color:var(--fg-faint); margin-bottom:4px;}
+.wheel2-result .wr-name{font-family:"Noto Serif TC",serif; font-weight:700; font-size:22px; color:var(--accent);}
+
 @media (max-width:640px){
   .masthead{padding:20px 0 14px;}
   .stat-row{gap:18px;}
@@ -365,6 +377,7 @@ footer{
     </select>
     <button class="reset-btn" id="reset-btn">清除篩選</button>
     <button class="reset-btn" id="wheel-btn" type="button">🎡 轉盤抽選</button>
+    <button class="reset-btn" id="wheel2-btn" type="button">👥 成員轉盤</button>
   </div>
   <div class="tagbar" id="status-bar">
     <button class="tag-chip st-chip st-released" data-status="released" type="button">✅ 已上市 <span class="n" id="cnt-released"></span></button>
@@ -412,6 +425,19 @@ footer{
     <div class="wheel-legend" id="wheel-legend"></div>
     <button class="wheel-spin-btn" id="wheel-spin-btn" type="button">🎲 開始轉動！</button>
     <div class="wheel-result" id="wheel-result" hidden></div>
+  </div>
+</div>
+
+<div class="wheel-overlay" id="wheel2-overlay" hidden>
+  <div class="wheel-box">
+    <button class="wheel-close" id="wheel2-close" type="button" aria-label="關閉">✕</button>
+    <h2 class="serif">👥 成員轉盤</h2>
+    <div class="wheel-stage">
+      <div class="wheel-pointer"></div>
+      <div class="wheel-visual" id="wheel2-visual"><div class="wheel-hub">🎯</div></div>
+    </div>
+    <button class="wheel-spin-btn" id="wheel2-spin-btn" type="button">🎲 開始轉動！</button>
+    <div class="wheel2-result" id="wheel2-result" hidden></div>
   </div>
 </div>
 
@@ -909,6 +935,87 @@ footer{
     renderWheelStage();
   });
   wheelSpinBtn.addEventListener('click', spinWheel);
+
+  // ---- 第二個轉盤：固定 5 個成員名字，沒有篩選、每個名字各自一格 ----
+  var WHEEL2_ITEMS = ['GoXuan', '千早愛音常騎爽世', 'howard', 'john521521', '嚕嚕米'];
+  var wheel2Overlay = document.getElementById('wheel2-overlay');
+  var wheel2Btn = document.getElementById('wheel2-btn');
+  var wheel2Close = document.getElementById('wheel2-close');
+  var wheel2VisualEl = document.getElementById('wheel2-visual');
+  var wheel2SpinBtn = document.getElementById('wheel2-spin-btn');
+  var wheel2ResultEl = document.getElementById('wheel2-result');
+  var wheel2Rotation = 0;
+  var wheel2Spinning = false;
+
+  function buildWheel2(){
+    var n = WHEEL2_ITEMS.length;
+    var segAngle = 360 / n;
+    var stops = [];
+    for(var i = 0; i < n; i++){
+      stops.push(wheelColor(i, n) + ' ' + (segAngle*i) + 'deg ' + (segAngle*(i+1)) + 'deg');
+    }
+    wheel2VisualEl.style.background = 'conic-gradient(' + stops.join(',') + ')';
+
+    Array.prototype.slice.call(wheel2VisualEl.querySelectorAll('.wheel-seg-label')).forEach(function(el){ el.remove(); });
+    var hub = wheel2VisualEl.querySelector('.wheel-hub');
+    WHEEL2_ITEMS.forEach(function(name, i){
+      var centerAngle = segAngle*i + segAngle/2;
+      var label = document.createElement('div');
+      label.className = 'wheel-seg-label';
+      label.textContent = name;
+      label.style.transform = 'rotate(' + centerAngle + 'deg) translateY(-82px) rotate(-' + centerAngle + 'deg)';
+      wheel2VisualEl.insertBefore(label, hub);
+    });
+  }
+
+  function showWheel2Result(name){
+    wheel2ResultEl.innerHTML = '<div class="wr-label">🎉 抽中了</div><div class="wr-name">' + escHtml(name) + '</div>';
+    wheel2ResultEl.hidden = false;
+  }
+
+  function spinWheel2(){
+    if(wheel2Spinning) return;
+    wheel2Spinning = true;
+    wheel2SpinBtn.disabled = true;
+    wheel2ResultEl.hidden = true;
+
+    var n = WHEEL2_ITEMS.length;
+    var winnerIdx = Math.floor(Math.random() * n);
+    var winner = WHEEL2_ITEMS[winnerIdx];
+    var segAngle = 360 / n;
+    var targetWheelAngle = winnerIdx * segAngle + segAngle / 2;
+    var desiredMod = (360 - targetWheelAngle + 360) % 360;
+    var extraSpins = 5 + Math.floor(Math.random() * 2);
+
+    var base = Math.floor(wheel2Rotation / 360) * 360;
+    var candidate = base + desiredMod;
+    if(candidate <= wheel2Rotation) candidate += 360;
+    wheel2Rotation = candidate + extraSpins * 360;
+
+    wheel2VisualEl.style.transition = 'transform 3.4s cubic-bezier(.12,.68,.12,1)';
+    wheel2VisualEl.style.transform = 'rotate(' + wheel2Rotation + 'deg)';
+
+    setTimeout(function(){
+      wheel2Spinning = false;
+      wheel2SpinBtn.disabled = false;
+      showWheel2Result(winner);
+    }, 3500);
+  }
+
+  function openWheel2(){
+    wheel2Overlay.hidden = false;
+    buildWheel2();
+    wheel2ResultEl.hidden = true;
+  }
+  function closeWheel2(){
+    wheel2Overlay.hidden = true;
+  }
+
+  wheel2Btn.addEventListener('click', openWheel2);
+  wheel2Close.addEventListener('click', closeWheel2);
+  wheel2Overlay.addEventListener('click', function(e){ if(e.target === wheel2Overlay) closeWheel2(); });
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && !wheel2Overlay.hidden) closeWheel2(); });
+  wheel2SpinBtn.addEventListener('click', spinWheel2);
 
   render();
 })();
