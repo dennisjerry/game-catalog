@@ -528,7 +528,8 @@ footer{
   var PLAYER_BUCKETS = [
     {key:'solo', label:'單人', test:function(g){ return maxPlayers(g.pl) === 1; }},
     {key:'duo', label:'雙人', test:function(g){ return maxPlayers(g.pl) === 2; }},
-    {key:'small', label:'3-4人', test:function(g){ var n = maxPlayers(g.pl); return n>=3 && n<=4; }},
+    {key:'p3', label:'3人', test:function(g){ return maxPlayers(g.pl) === 3; }},
+    {key:'p4', label:'4人', test:function(g){ return maxPlayers(g.pl) === 4; }},
     {key:'medium', label:'5-8人', test:function(g){ var n = maxPlayers(g.pl); return n>=5 && n<=8; }},
     {key:'large', label:'9人以上', test:function(g){ var n = maxPlayers(g.pl); return n>=9; }},
     {key:'multi_unknown', label:'多人（人數不定）', test:function(g){ return g.pl === '多人'; }}
