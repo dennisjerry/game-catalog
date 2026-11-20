@@ -540,7 +540,8 @@ footer{
     {key:'p4', label:'4人', test:function(g){ return maxPlayers(g.pl) === 4; }},
     {key:'medium', label:'5-8人', test:function(g){ var n = maxPlayers(g.pl); return n>=5 && n<=8; }},
     {key:'large', label:'9人以上', test:function(g){ var n = maxPlayers(g.pl); return n>=9; }},
-    {key:'multi_unknown', label:'多人（人數不定）', test:function(g){ return g.pl === '多人'; }}
+    {key:'multi_unknown', label:'多人（人數不定）', test:function(g){ return g.pl === '多人'; }},
+    {key:'unknown', label:'未知', test:function(g){ return !g.pl; }}
   ];
   var playersBar = document.getElementById('players-bar');
   PLAYER_BUCKETS.forEach(function(b){
