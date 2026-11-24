@@ -342,6 +342,16 @@ footer{
   .wheel-stage{width:220px; height:220px;}
 }
 </style>
+<script>
+(function(){
+  try{
+    var saved = localStorage.getItem('theme');
+    if(saved === 'light' || saved === 'dark'){
+      document.documentElement.setAttribute('data-theme', saved);
+    }
+  }catch(e){}
+})();
+</script>
 
 <div class="masthead">
   <div class="masthead-top">
@@ -382,6 +392,7 @@ footer{
     <button class="reset-btn" id="reset-btn">清除篩選</button>
     <button class="reset-btn" id="wheel-btn" type="button">🎡 轉盤抽選</button>
     <button class="reset-btn" id="wheel2-btn" type="button">👥 成員轉盤</button>
+    <button class="reset-btn" id="theme-toggle-btn" type="button">🌙 深色</button>
   </div>
   <div class="tagbar" id="status-bar">
     <button class="tag-chip st-chip st-released" data-status="released" type="button">✅ 已上市 <span class="n" id="cnt-released"></span></button>
@@ -456,6 +467,30 @@ footer{
     }
   });
   var state = { q:'', tags:[], statuses:[], sharers:[], players:[], sort:'date-desc' };
+
+  // ---- light/dark theme toggle ----
+  function getEffectiveTheme(){
+    var explicit = document.documentElement.getAttribute('data-theme');
+    if(explicit === 'light' || explicit === 'dark') return explicit;
+    return (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
+  }
+  function updateThemeBtnLabel(){
+    var btn = document.getElementById('theme-toggle-btn');
+    if(!btn) return;
+    btn.textContent = getEffectiveTheme() === 'dark' ? '☀️ 淺色' : '🌙 深色';
+  }
+  function applyTheme(theme){
+    document.documentElement.setAttribute('data-theme', theme);
+    try{ localStorage.setItem('theme', theme); }catch(e){}
+    updateThemeBtnLabel();
+  }
+  var themeBtn = document.getElementById('theme-toggle-btn');
+  if(themeBtn){
+    themeBtn.addEventListener('click', function(){
+      applyTheme(getEffectiveTheme() === 'dark' ? 'light' : 'dark');
+    });
+  }
+  updateThemeBtnLabel();
 
   document.getElementById('stat-total').textContent = DATA.length;
   document.getElementById('stat-steam').textContent = DATA.filter(function(g){ return !!g.cv; }).length;
