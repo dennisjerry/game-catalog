@@ -69,6 +69,7 @@ a{color:var(--accent);}
   white-space:nowrap;
 }
 .src-badge b{color:var(--fg-dim); font-weight:600;}
+.badge-group{display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
 .stat-row{
   display:flex; gap:28px; margin-top:18px; flex-wrap:wrap;
 }
@@ -345,7 +346,10 @@ footer{
 <div class="masthead">
   <div class="masthead-top">
     <h1>戰情速報</h1>
-    <span class="src-badge">來源：<b>愛國同心會</b> Discord 文字頻道 · <span id="src-date-range">2025.04 – 2026.10</span></span>
+    <div class="badge-group">
+      <span class="src-badge">來源：<b>愛國同心會</b> Discord 文字頻道 · <span id="src-date-range">2025.04 – 2026.10</span></span>
+      <span class="src-badge" title="每款遊戲新增時會查一次價格，之後不會隨新遊戲上架自動更新；這個日期是整個清單最後一次整批重新核對價格的時間">💰 總體價格更新於 <b id="price-updated-at">2026-11-24</b></span>
+    </div>
   </div>
   <p class="tagline">頻道裡一年半累積下來的遊戲分享全部挖出來去重，Steam 連結查官方資料，Facebook 貼文截圖一張張看過，整理成一份可以搜尋的清單。</p>
   <div class="status-legend">
